@@ -1,0 +1,24 @@
+from django.urls import path
+from. import views
+
+urlpatterns = [
+    path('api/admin-only/', views.AdminOnlyView.as_view()),
+    path('api/staff-only/', views.StaffOnlyView.as_view()),
+    path('api/users/', views.UserListCreateView.as_view()),
+    path('api/token/obtain/', views.ObtainTokenPairWithRoleView.as_view()),
+    path('password-reset/', views.PasswordResetRequestView.as_view()),
+    path('password-reset-confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
+    path('api/buses/', views.BusList.as_view()),
+    path('api/buses/<pk>/', views.BusDetail.as_view()),
+    path('api/routes/', views.RouteListCreate.as_view()),
+    path('api/routes/<pk>/', views.RouteRetrieveUpdateDestroy.as_view()),
+    path('api/bookings/', views.BookingListView.as_view()),
+    path('api/bookings/<pk>/', views.BookingDetailView.as_view()),
+    path('api/bus-expenditures/', views.BusExpenditureListCreateView.as_view()),
+    path('api/bus-expenditures/<pk>/', views.BusExpenditureRetrieveUpdateDestroyView.as_view()),
+    path('api/bus-reviews/', views.BusReviewListCreateView.as_view()),
+    path('api/bus-reviews/<pk>/', views.BusReviewRetrieveUpdateDestroyView.as_view()),
+    path('api/expenditures/', views.ExpenditureList.as_view()),
+    path('api/expenditures/<pk>/', views.ExpenditureDetail.as_view()),
+
+]
