@@ -65,7 +65,7 @@ class UserListCreateView(generics.ListCreateAPIView):
 
 class ObtainTokenPairWithRoleView(APIView):
     permission_classes = (AllowAny,)
-
+    
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -76,7 +76,11 @@ class ObtainTokenPairWithRoleView(APIView):
             "access": str(refresh.access_token),
             "role": user.role
         })
-        
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "message": "This endpoint only supports POST requests.",
+            "supported_methods": ["POST"]
+        }, status=405)        
 
 class PasswordResetRequestView(APIView):
     serializer_class = PasswordResetSerializer
@@ -88,7 +92,18 @@ class PasswordResetRequestView(APIView):
             return Response({'success': 'Password reset email has been sent.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    
+class ObtainTokenPairWithRoleView(APIView):
+    permission_classes = (AllowAny,)
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+            "role": user.role
+        })
 
 def password_reset_confirm(request, uidb64, token):
     try:
