@@ -1,5 +1,7 @@
 from django.urls import path
 from. import views
+from .views import contact
+
 
 urlpatterns = [
     path('api/admin-only/', views.AdminOnlyView.as_view()),
@@ -14,11 +16,17 @@ urlpatterns = [
     path('api/routes/<pk>/', views.RouteRetrieveUpdateDestroy.as_view()),
     path('api/bookings/', views.BookingListView.as_view()),
     path('api/bookings/<pk>/', views.BookingDetailView.as_view()),
+    path('api/bookings/', views.BookingCreateView.as_view()),
+
     path('api/bus-expenditures/', views.BusExpenditureListCreateView.as_view()),
     path('api/bus-expenditures/<pk>/', views.BusExpenditureRetrieveUpdateDestroyView.as_view()),
     path('api/bus-reviews/', views.BusReviewListCreateView.as_view()),
     path('api/bus-reviews/<pk>/', views.BusReviewRetrieveUpdateDestroyView.as_view()),
     path('api/expenditures/', views.ExpenditureList.as_view()),
     path('api/expenditures/<pk>/', views.ExpenditureDetail.as_view()),
+    path('api/contact/', contact, name='contact'),
+    path('api/contacts/', views.ContactListView.as_view()),
+    path('api/contacts/create/', views.ContactCreateView.as_view()),
 
 ]
+

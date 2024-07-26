@@ -240,6 +240,23 @@ class BookingDetail(APIView):
         booking.delete()
         return Response({'message': 'Booking deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
+class BookingCreateView(APIView):
+    def post(self, request):
+        data = request.data
+        booking = Booking.objects.create(
+            booking_date=data['booking_date'],
+            booking_time=data['booking_time'],
+            booking_route_id=data['booking_route'],
+            booking_bus_id=data['booking_bus'],
+            booking_seat=data['booking_seat'],
+            booking_passenger_id=data['booking_passenger'],
+            booking_status=data['booking_status'],
+            booking_fare=data['booking_fare'],
+            booking_payment=data['booking_payment'],
+            booking_cancel=data['booking_cancel']
+        )
+        return Response({'message': 'Booking created successfully', 'booking_id': booking.booking_id}, status=status.HTTP_201_CREATED)
+
 class BusExpenditureListCreateView(generics.ListCreateAPIView):
     queryset = BusExpenditure.objects.all()
     serializer_class = BusExpenditureSerializer
@@ -411,3 +428,38 @@ class AdminOnlyView(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAdminUser]
+
+
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import Contact
+
+@csrf_exempt
+def contact(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        contact = Contact(name=name, email=email, message=message)
+        contact.save()
+        return JsonResponse({'message': 'Form submitted successfully!'})
+    return JsonResponse({'message': 'Invalid request method.'})
+
+
+from .models import Contact
+from .serializers import ContactSerializer
+
+class ContactCreateView(APIView):
+    def post(self, request):
+        serializer = ContactSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Contact form submitted successfully'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ContactListView(APIView):
+    def get(self, request):
+        contacts = Contact.objects.all()
+        serializer = ContactSerializer(contacts, many=True)
+        return Response(serializer.data)

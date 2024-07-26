@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
+from django.core.mail import send_mail
+
 
 STATUS_CHOICES = [
     ('pending', 'Pending'),
@@ -119,3 +121,25 @@ class Expenditure(models.Model):
 
     def __str__(self):
         return f"Expenditure for Bus ID: {self.bus.bus_id}"
+
+class Contact(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        send_mail(
+            'New Contact Form Submission',
+            f'Name: {self.name}\nEmail: {self.email}\nMessage: {self.message}',
+            '',  
+            ['roygacherumuhungi@gmail.com'],
+            fail_silently=False,
+        )
+
+
+    
+
