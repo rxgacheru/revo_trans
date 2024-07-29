@@ -6,7 +6,7 @@ from .views import contact
 urlpatterns = [
     path('api/admin-only/', views.AdminOnlyView.as_view()),
     path('api/staff-only/', views.StaffOnlyView.as_view()),
-    path('api/users/', views.UserListCreateView.as_view()),
+    path('api/users/', views.UserListCreateView.as_view(), name='user-list-create'),
     path('api/login/', views.ObtainTokenPairWithRoleView.as_view(), name="token_obtain_pair"),
     path('api/login/<int:pk>/', views.ObtainTokenPairWithRoleView.as_view(), name="token_obtain_pair"),
     path('password-reset/', views.PasswordResetRequestView.as_view()),

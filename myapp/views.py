@@ -62,25 +62,7 @@ class UserListCreateView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             self.permission_classes = [AllowAny]
         return super().get_permissions()
-
-class ObtainTokenPairWithRoleView(APIView):
-    permission_classes = (AllowAny,)
     
-    def post(self, request, *args, **kwargs):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data["user"]
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-            "role": user.role
-        })
-    def get(self, request, *args, **kwargs):
-        return Response({
-            "message": "This endpoint only supports POST requests.",
-            "supported_methods": ["POST"]
-        }, status=405)        
 
 class PasswordResetRequestView(APIView):
     serializer_class = PasswordResetSerializer
