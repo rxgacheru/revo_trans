@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.mail import send_mail
 
 
+
 STATUS_CHOICES = [
     ('pending', 'Pending'),
     ('confirmed', 'Confirmed'),
@@ -140,6 +141,4 @@ class Contact(models.Model):
             fail_silently=False,
         )
 
-
-    
 
