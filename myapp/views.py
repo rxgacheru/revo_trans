@@ -233,9 +233,27 @@ class BookingCreateView(APIView):
         serializer = BookingSerializer(data=request.data)
         if serializer.is_valid():
             booking = serializer.save()
+            email_content = f"""
+            Your booking has been confirmed with the following details:
+            
+            DATE: {booking.booking_date}
+            TIME: {booking.booking_time}
+            ROUTE: {booking.booking_route}
+            BUS NO.: {booking.booking_bus}
+            PASSENGER: {booking.booking_passenger}
+            FEE: {booking.booking_fare}
+            PAYMENT STATUS: {booking.booking_payment}
+            FEE: {booking.booking_fare}
+            CONFIRMATION: {booking.booking_confirmation}
+
+            Thank you for choosing our service!
+
+            Best regards,
+            RevoTrans
+            """
             send_mail(
                 'Booking Confirmation',
-                'Your bus booking has been successfully made!',
+                email_content,
                 settings.DEFAULT_FROM_EMAIL,
                 [request.data['booking_email']],
                 fail_silently=False,
