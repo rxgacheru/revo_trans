@@ -91,7 +91,7 @@ class Booking(models.Model):
     booking_fare = models.DecimalField(max_digits=10, decimal_places=2)
     booking_payment = models.CharField(max_length=255, choices=STATUS_PAYMENT, blank=True, null=True)
     booking_confirmation = models.CharField(max_length=255, choices=STATUS_CHOICES, blank=True, null=True)
-    booking_email = models.DecimalField(max_digits=50, decimal_places=2)
+    booking_email = models.EmailField(max_length=255, null=True)
 
 
     def __str__(self):
