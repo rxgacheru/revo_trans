@@ -5,10 +5,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import CustomUser, Bus, Route, Booking, BusExpenditure
 from .serializers import CustomUserSerializer, BusSerializer, RouteSerializer, BusExpenditureSerializer
-
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.core.mail import send_mail
+from django.conf import settings
 
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -200,70 +203,46 @@ class RouteDetail(APIView):
 
 @csrf_exempt
 
-class BookingDetail(APIView):
-    def get(self, request, booking_id):
-        booking = get_object_or_404(Booking, booking_id=booking_id)
-        data = {
-            'booking_id': booking.booking_id,
-            'booking_date': booking.booking_date,
-            'booking_time': booking.booking_time,
-            'booking_route': booking.booking_route.route_name,
-            'booking_bus': booking.booking_bus.bus_name,
-            'booking_seat': booking.booking_seat,
-            'booking_passenger': booking.booking_passenger.username,
-            'booking_status': booking.booking_status,
-            'booking_fare': booking.booking_fare,
-            'booking_payment': booking.booking_payment,
-            'booking_cancel': booking.booking_cancel
-        }
-        return Response(data, status=status.HTTP_200_OK)
+class BookingListView(APIView):
+    def get(self, request):
+        bookings = Booking.objects.all()
+        serializer = BookingSerializer(bookings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, booking_id):
-        booking = get_object_or_404(Booking, booking_id=booking_id)
-        data = json.loads(request.body)
-        booking.booking_status = data.get('booking_status', booking.booking_status)
-        booking.booking_payment = data.get('booking_payment', booking.booking_payment)
-        booking.save()
-        return Response({'message': 'Booking updated successfully'}, status=status.HTTP_200_OK)
+class BookingDetailView(APIView):
+    def get(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        serializer = BookingSerializer(booking)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request):
-        data = json.loads(request.body)
-        booking = Booking.objects.create(
-            booking_id=data['booking_id'],
-            booking_date=data['booking_date'],
-            booking_time=data['booking_time'],
-            booking_route_id=data['booking_route'],
-            booking_bus_id=data['booking_bus'],
-            booking_seat=data['booking_seat'],
-            booking_passenger_id=data['booking_passenger'],
-            booking_status=data['booking_status'],
-            booking_fare=data['booking_fare'],
-            booking_payment=data['booking_payment'],
-            booking_cancel=data['booking_cancel']
-        )
-        return Response({'message': 'Booking created successfully', 'booking_id': booking.booking_id}, status=status.HTTP_201_CREATED)
+    def put(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        serializer = BookingSerializer(booking, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Booking updated successfully'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, booking_id):
-        booking = get_object_or_404(Booking, booking_id=booking_id)
+    def delete(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
         booking.delete()
         return Response({'message': 'Booking deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 class BookingCreateView(APIView):
     def post(self, request):
-        data = request.data
-        booking = Booking.objects.create(
-            booking_date=data['booking_date'],
-            booking_time=data['booking_time'],
-            booking_route_id=data['booking_route'],
-            booking_bus_id=data['booking_bus'],
-            booking_seat=data['booking_seat'],
-            booking_passenger_id=data['booking_passenger'],
-            booking_status=data['booking_status'],
-            booking_fare=data['booking_fare'],
-            booking_payment=data['booking_payment'],
-            booking_cancel=data['booking_cancel']
-        )
-        return Response({'message': 'Booking created successfully', 'booking_id': booking.booking_id}, status=status.HTTP_201_CREATED)
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save()
+            send_mail(
+                'Booking Confirmation',
+                'Your bus booking has been successfully made!',
+                settings.DEFAULT_FROM_EMAIL,
+                [request.data['booking_email']],
+                fail_silently=False,
+            )
+            return Response({'message': 'Booking created successfully', 'booking_id': booking.booking_id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+     
 
 class BusExpenditureListCreateView(generics.ListCreateAPIView):
     queryset = BusExpenditure.objects.all()

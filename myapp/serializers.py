@@ -86,7 +86,28 @@ class RouteSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
-        fields = '__all__'
+        fields = [
+            'booking_id', 'booking_date', 'booking_time', 'booking_route', 
+            'booking_bus', 'booking_passenger', 'booking_fare', 'booking_payment', 
+            'booking_confirmation', 'booking_email'
+        ]
+
+    def create(self, validated_data):
+        booking = Booking.objects.create(**validated_data)
+        return booking
+
+    def update(self, instance, validated_data):
+        instance.booking_date = validated_data.get('booking_date', instance.booking_date)
+        instance.booking_time = validated_data.get('booking_time', instance.booking_time)
+        instance.booking_route = validated_data.get('booking_route', instance.booking_route)
+        instance.booking_bus = validated_data.get('booking_bus', instance.booking_bus)
+        instance.booking_passenger = validated_data.get('booking_passenger', instance.booking_passenger)
+        instance.booking_fare = validated_data.get('booking_fare', instance.booking_fare)
+        instance.booking_payment = validated_data.get('booking_payment', instance.booking_payment)
+        instance.booking_confirmation = validated_data.get('booking_confirmation', instance.booking_confirmation)
+        instance.booking_email = validated_data.get('booking_email', instance.booking_email)
+        instance.save()
+        return instance
 
 class BusReviewSerializer(serializers.ModelSerializer):
     class Meta:

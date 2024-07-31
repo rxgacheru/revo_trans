@@ -17,9 +17,9 @@ urlpatterns = [
     path('api/buses/<pk>/', views.BusDetail.as_view()),
     path('api/routes/', views.RouteListCreate.as_view()),
     path('api/routes/<pk>/', views.RouteRetrieveUpdateDestroy.as_view()),
-    path('api/bookings/', views.BookingListView.as_view()),
-    path('api/bookings/<pk>/', views.BookingDetailView.as_view()),
-    path('api/bookings/', views.BookingCreateView.as_view()),
+    path('api/bookings/', views.BookingListView.as_view(), name='booking-list'),
+    path('api/bookings/<int:pk>/', views.BookingDetailView.as_view(), name='booking-detail'),
+    path('api/bookings/create/', views.BookingCreateView.as_view(), name='booking-create'),
 
     path('api/bus-expenditures/', views.BusExpenditureListCreateView.as_view()),
     path('api/bus-expenditures/<pk>/', views.BusExpenditureRetrieveUpdateDestroyView.as_view()),

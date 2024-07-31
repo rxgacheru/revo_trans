@@ -87,12 +87,12 @@ class Booking(models.Model):
     booking_time = models.TimeField()
     booking_route = models.CharField(max_length=255)
     booking_bus = models.CharField(max_length=255)
-    booking_seat = models.CharField(max_length=255)
     booking_passenger = models.CharField(max_length=255)
-    booking_status = models.CharField(max_length=255) 
     booking_fare = models.DecimalField(max_digits=10, decimal_places=2)
     booking_payment = models.CharField(max_length=255, choices=STATUS_PAYMENT, blank=True, null=True)
     booking_confirmation = models.CharField(max_length=255, choices=STATUS_CHOICES, blank=True, null=True)
+    booking_email = models.DecimalField(max_digits=50, decimal_places=2)
+
 
     def __str__(self):
         return f"Booking ID: {self.booking_id}, Route: {self.booking_route.route_name}, Passenger: {self.booking_passenger.username}, Status: {self.booking_status}"
