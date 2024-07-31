@@ -1,6 +1,7 @@
 from django.urls import path
 from. import views
 from .views import contact
+from .views import login_view
 
 
 urlpatterns = [
@@ -8,6 +9,7 @@ urlpatterns = [
     path('api/staff-only/', views.StaffOnlyView.as_view()),
     path('api/users/', views.UserListCreateView.as_view(), name='user-list-create'),
     path('api/login/', views.ObtainTokenPairWithRoleView.as_view(), name="token_obtain_pair"),
+    path('api/login/', login_view, name='login'),
     path('api/login/<int:pk>/', views.ObtainTokenPairWithRoleView.as_view(), name="token_obtain_pair"),
     path('password-reset/', views.PasswordResetRequestView.as_view()),
     path('password-reset-confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),

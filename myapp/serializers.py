@@ -11,10 +11,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'password', 'role']
 
     def create(self, validated_data):
+        role = validated_data.get('role', 'default_role')
         user = CustomUser.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
-            role=validated_data['role']
+            role=role
         )
         user.set_password(validated_data['password'])
         user.save()
@@ -28,14 +29,15 @@ class CustomUserSerializer(serializers.ModelSerializer):
             instance.set_password(validated_data['password'])
         instance.save()
         return instance
+from django.contrib.auth import authenticate
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
     
     def validate(self, data):
-        email = data.get("email", "")
-        password = data.get("password", "")
+        email = data.get("email")
+        password = data.get("password")
         
         if email and password:
             try:
@@ -51,9 +53,8 @@ class LoginSerializer(serializers.Serializer):
             else:
                 raise serializers.ValidationError("Invalid email or password.")
         else:
-            raise serializers.ValidationError("Must provide email and password both.")
+            raise serializers.ValidationError("Must provide both email and password.")
         return data
-    
     
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()

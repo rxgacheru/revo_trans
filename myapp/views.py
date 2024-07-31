@@ -29,6 +29,8 @@ from .permissions import IsAdminUser, IsStaffUser
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import SetPasswordForm
+from rest_framework.decorators import api_view
+
 
 User = get_user_model()
 
@@ -107,8 +109,17 @@ def password_reset_confirm(request, uidb64, token):
         return render(request, 'password_reset_confirm.html', {'form': form})
     else:
         messages.error(request, 'The password reset link is invalid or has expired.')
-        return redirect('password_reset')  # Redirect to password reset request page
+        return redirect('password_reset')  
     
+@api_view(['POST'])
+def login_view(request):
+    serializer = LoginSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.validated_data['user']
+        
+        return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class BusList(APIView):
     def get(self, request):
